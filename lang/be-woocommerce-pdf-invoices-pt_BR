@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WooCommerce Fatura em PDF</title>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+  <style>
+
+
+/*
+Based on Minimal CSS (minimalcss.com) under the MIT license.
+*/
+
+/* Reset */
+* { margin: 0; padding: 0; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
+
+/* Layout */
+body { background-color: #fff; color: #333;	font: 14px/20px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+header { width: 100%; margin: 0 auto; position: relative; padding: 20px 0; margin-bottom: 20px; }
+
+nav ul { margin: 0; }
+nav ul li { display: inline; margin-right: 20px; font-size: 16px; line-height: 28px; color: #333; }
+nav ul li a { color: #333; }
+
+.container { position: relative; max-width: 90%; margin: 0 auto; }
+
+footer { border-top:1px solid #ccc; font-size:11px; line-height:26px; color:#999; }
+footer a { color:#999999; }
+footer a:hover { color:#105CB6; }
+footer ul li { display:inline; list-style:none; padding-left:20px; }
+
+/* Typography */
+a { color: #105CB6; text-decoration: none; }
+a:hover, a:focus { color: #105CB6; text-decoration: underline; }
+a:active { color: #105CB6; }
+
+h1 { font-size: 24px; line-height: 20px; margin: 10px 0; }
+h2 { font-size: 20px; line-height: 20px; margin: 10px 0; }
+h3 { font-size: 16px; line-height: 20px; margin: 10px 0; }
+h4 { font-size: 14px; line-height: 20px; margin: 10px 0; }
+h5 { font-size: 12px; line-height: 20px; margin: 10px 0; }
+h5 { font-size: 10px; line-height: 20px; margin: 10px 0; }
+h1,h2,h3,h4,h5,h6 { color: #333; }
+
+p { margin-bottom: 10px; }
+
+.float-left     { float: left; }
+.float-right    { float: right; }
+img.float-left  { float: left; margin: 0 20px 20px 0; }
+img.float-right { float: right; margin: 0 0 20px 20px; }
+img.center      { margin: 0 auto; display: block; }
+
+.text-left    { text-align: left; }
+.text-center  { text-align: center; }
+.text-right   { text-align: right; }
+.text-justify { text-align: justify; }
+
+/* Misc */
+hr { background-color: #ccc; border: 0px; color: #ccc; height: 1px; margin: 8px 0 20px 0; }
+pre, code { background:#E0ECF6; display:block; margin-bottom: 20px; padding:10px; }
+
+blockquote { margin: 10px 10px 20px; padding: 9px; background-color: #f8f8f8; color: #666; border-left: 5px solid #ddd; font: 14px/20px Georgia, Times, serif; quotes: "\201C" "\201D"; }
+blockquote p { margin: 0; }
+blockquote:before { content: open-quote; font-weight: bold; }
+blockquote:after  { content: close-quote; font-weight: bold; }
+
+/* List */
+ul { list-style-position:inside; }
+ol { list-style-position:inside; }
+
+/* Table */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+th { font-weight: bold; }
+tfoot { font-style: italic; }
+
+/* Metadata part */
+
+.metadata {
+  margin-top: 15px;
+  margin-bottom: 10px;
+  font-size: 90%;
+}
+table.metadata td {
+  padding-right: 20px;
+}
+
+.stats {
+  padding-top: 5px;
+  padding-bottom: 20px;
+}
+.graph {
+  width: 100%;
+}
+.graph div { float: left; }
+.graph div:first-child { border-radius: 3px 0 0 3px; }
+.graph div:last-child { border-radius: 0 3px 3px 0; }
+.percent-done    { background-color: #BFEE3F; height: 10px; }
+.percent-fuzzy   { background-color: #FEEE43; height: 10px; }
+.percent-untrans { background-color: #F1F5F5; height: 10px; }
+.legend {
+  font-size: smaller;
+  color: #aaa;
+  padding-top: 12px;
+  text-align: center;
+}
+
+/* Translations */
+table.translations {
+  width: 100%;
+  table-layout: fixed;
+}
+table.translations th, table.translations td {
+  padding: 5px 10px;
+  vertical-align: top;
+  border-bottom: 1px solid #E1E1E1;
+}
+table.translations th {
+  text-align: left;
+}
+table.translations th:first-child, table.translations td:first-child { padding-left: 0; }
+table.translations th:last-child, table.translations td:last-child { padding-right: 0; }
+
+.with-comments td {
+  border-bottom: none !important;
+}
+tr.comments div {
+  float: right;
+  max-width: 75%;
+  font-size: smaller;
+  color: #aaa;
+}
+tr.comments div p:last-child { margin-bottom: 0; }
+
+.fuzzy .tra {
+  color: #a9861b;
+}
+
+.msgctxt {
+  font-size: smaller;
+  color: #6d8e13;
+}
+
+
+  </style>
+</head>
+<body>
+<div class='container'>
+<table class='metadata'>
+<tr><td>Projeto:</td><td>WooCommerce PDF Invoices</td></tr>
+<tr><td>Idioma:</td><td>português (Brasil)</td></tr>
+</table>
+<div class='stats'>
+  <div class='graph'>
+    <div class='percent-done' style='width: 100%'>&nbsp;</div>
+  </div>
+  <div class='legend'>Traduzido: 97 de 97 (100 %)  </div>
+</div>
+<table class='translations'>
+  <thead>
+    <tr>
+      <th>Texto fonte - inglês</th>
+      <th>Tradução — português (Brasil)</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr class='i'>
+<td class='src'  lang='en'>
+General</td>
+<td class='tra'  lang='pt-BR'>
+Geral</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Template</td>
+<td class='tra'  lang='pt-BR'>
+Modelo</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Invoices</td>
+<td class='tra'  lang='pt-BR'>
+Faturas</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+PDF Invoice</td>
+<td class='tra'  lang='pt-BR'>
+Fatura em PDF</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Invoiced on:</td>
+<td class='tra'  lang='pt-BR'>
+Fatura em:</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Invoice number:</td>
+<td class='tra'  lang='pt-BR'>
+Número da Fatura:</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+View invoice</td>
+<td class='tra'  lang='pt-BR'>
+Ver Fatura</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+View</td>
+<td class='tra'  lang='pt-BR'>
+Visualizar</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Cancel invoice</td>
+<td class='tra'  lang='pt-BR'>
+Cancelar fatura</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Cancel</td>
+<td class='tra'  lang='pt-BR'>
+Cancelar</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Are you sure to delete the invoice?</td>
+<td class='tra'  lang='pt-BR'>
+Você tem certeza que deseja deletar a fatura?</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Create invoice</td>
+<td class='tra'  lang='pt-BR'>
+Criar fatura</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Create</td>
+<td class='tra'  lang='pt-BR'>
+Criar</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Download invoice (PDF)</td>
+<td class='tra'  lang='pt-BR'>
+Baixar fatura (PDF)</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Thank you for using &lt;b&gt;WooCommerce PDF Invoices&lt;/b&gt; for some time now. Please show us your appreciation by leaving a ★★★★★ rating. A huge thank you in advance! &lt;br /&gt; &lt;a href='%s' target='_blank'&gt;Yes, will do it right away!&lt;/a&gt; - &lt;a href='%s'&gt;No, already done it!&lt;/a&gt;</td>
+<td class='tra'  lang='pt-BR'>
+Obrigado por usar &lt;b&gt;WooCommerce Fatura em PDF&lt;/b&gt;. Mostre-nos a sua gratidão dando ★★★★★ estrelas. Muito obrigado! &lt;br /&gt; &lt;a href='%s' target='_blank'&gt;Sim, farei isso agora!&lt;/a&gt; - &lt;a href='%s'&gt;Não, mas obrigado!&lt;/a&gt;</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Attach to Email</td>
+<td class='tra'  lang='pt-BR'>
+Anexar no Email</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Processing order</td>
+<td class='tra'  lang='pt-BR'>
+Processando</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Completed order</td>
+<td class='tra'  lang='pt-BR'>
+Pedido Completo</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Customer invoice</td>
+<td class='tra'  lang='pt-BR'>
+Fatura do cLIENTE</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Attach to New order Email</td>
+<td class='tra'  lang='pt-BR'>
+Anexar no email de Novo Pedido</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Enable Email It In</td>
+<td class='tra'  lang='pt-BR'>
+Habilitar o Email em</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Email It In account</td>
+<td class='tra'  lang='pt-BR'>
+Habilitar na conta de Email</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Get your account from your Email It In %suser account%s.</td>
+<td class='tra'  lang='pt-BR'>
+Obtenha sua conta de Email em %sconta de usuário%s.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Email Options</td>
+<td class='tra'  lang='pt-BR'>
+Opções de Email</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Cloud Storage Options</td>
+<td class='tra'  lang='pt-BR'>
+Opções de Armazenamento na Núvem</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Signup at %s to send invoices to your Dropbox, OneDrive, Google Drive or Egnyte and enter your account below.</td>
+<td class='tra'  lang='pt-BR'>
+Cadastre-se %s para enviar cópias de suas faturas no Dropbox, OneDrive, Google Drive ou Egnyte e entre com sua conta abaixo.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Feel free to use </td>
+<td class='tra'  lang='pt-BR'>
+Sinta-se livre para usar </td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Remove logo</td>
+<td class='tra'  lang='pt-BR'>
+Remover logomarca</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Color theme</td>
+<td class='tra'  lang='pt-BR'>
+Cores do tema</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Date format</td>
+<td class='tra'  lang='pt-BR'>
+Formato da data</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+%sFormat%s of invoice date and order date.</td>
+<td class='tra'  lang='pt-BR'>
+%sFormato%s da fatura, data e data de compra.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Company name</td>
+<td class='tra'  lang='pt-BR'>
+Nome da empresa</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Company logo</td>
+<td class='tra'  lang='pt-BR'>
+Logomarca da empresa</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Company address</td>
+<td class='tra'  lang='pt-BR'>
+Endereço da empresa</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Company details</td>
+<td class='tra'  lang='pt-BR'>
+Detalhes da empresa</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Intro text</td>
+<td class='tra'  lang='pt-BR'>
+Texto de introdução</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Terms &amp; conditions, policies etc.</td>
+<td class='tra'  lang='pt-BR'>
+Termos &amp; condições, políticas etc.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Show customer notes</td>
+<td class='tra'  lang='pt-BR'>
+Mostrar notas do comprador</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Type</td>
+<td class='tra'  lang='pt-BR'>
+Tipo</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+WooCommerce order number</td>
+<td class='tra'  lang='pt-BR'>
+Ordem de compra do WooCommerce</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Sequential number</td>
+<td class='tra'  lang='pt-BR'>
+Número sequencial</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Next</td>
+<td class='tra'  lang='pt-BR'>
+Próximo</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Reset the invoice counter and start with next invoice number. %s %sNote:%s Only available with sequential numbering type and you need to check the checkbox to actually reset the value.</td>
+<td class='tra'  lang='pt-BR'>
+Reinicie o contador da fatura e começar com o próximo número da fatura. %s %sNota:%s Somente disponível com o tipo de numeração sequencial e você precisa verificar a caixa de seleção para realmente redefinir o valor.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Digits</td>
+<td class='tra'  lang='pt-BR'>
+Dígitos</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+[prefix]</td>
+<td class='tra'  lang='pt-BR'>
+[prefixo]</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+[suffix]</td>
+<td class='tra'  lang='pt-BR'>
+[sufixo]</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Format</td>
+<td class='tra'  lang='pt-BR'>
+Formato</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Feel free to use the placeholders %s %s %s %s %s and %s. %s %sNote:%s %s is required.</td>
+<td class='tra'  lang='pt-BR'>
+Sinta-se livre para usar espaços reservados %s %s %s %s %s e %s. %s %sNota:%s %s é requerido.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Reset on 1st of january</td>
+<td class='tra'  lang='pt-BR'>
+Reiniciar no dia 1 de Janeiro</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+SKU</td>
+<td class='tra'  lang='pt-BR'>
+SKU</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Subtotal</td>
+<td class='tra'  lang='pt-BR'>
+Subtotal</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Tax</td>
+<td class='tra'  lang='pt-BR'>
+Taxa</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Discount</td>
+<td class='tra'  lang='pt-BR'>
+Desconto</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Shipping</td>
+<td class='tra'  lang='pt-BR'>
+Envio</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+General Options</td>
+<td class='tra'  lang='pt-BR'>
+Opções Gerais</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Invoice Number Options</td>
+<td class='tra'  lang='pt-BR'>
+Opções de Numeração da fatura</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Header Options</td>
+<td class='tra'  lang='pt-BR'>
+Opções do Cabeçalho</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Footer Options</td>
+<td class='tra'  lang='pt-BR'>
+Opções do Rodapé</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Visible Columns</td>
+<td class='tra'  lang='pt-BR'>
+Visibilidade das Colunas</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+These are the general template options.</td>
+<td class='tra'  lang='pt-BR'>
+Estas são as opções do modelo geral.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+These are the invoice number options.</td>
+<td class='tra'  lang='pt-BR'>
+Estas são as opções de número da fatura.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+The header will be visible on every page. </td>
+<td class='tra'  lang='pt-BR'>
+O cabeçalho será visível em todas as páginas. </td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+The footer will be visible on every page. </td>
+<td class='tra'  lang='pt-BR'>
+O rodapé será visível em todas as páginas. </td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Enable or disable the columns.</td>
+<td class='tra'  lang='pt-BR'>
+Habilitar ou desabilitar as colunas.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+File is invalid and contains either '..' or './'.</td>
+<td class='tra'  lang='pt-BR'>
+Arquivo é inválido e contém ou '..' ou './'.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+File is invalid and contains ':' after the first character.</td>
+<td class='tra'  lang='pt-BR'>
+Arquivo é inválido e contém ':' após o primeiro caractere.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+File should be less then 2MB.</td>
+<td class='tra'  lang='pt-BR'>
+Arquivo deve ser menor que 2MB.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Description</td>
+<td class='tra'  lang='pt-BR'>
+Descrição</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Cost</td>
+<td class='tra'  lang='pt-BR'>
+Custo</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Qty</td>
+<td class='tra'  lang='pt-BR'>
+Qtd</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+VAT</td>
+<td class='tra'  lang='pt-BR'>
+VAT</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Total</td>
+<td class='tra'  lang='pt-BR'>
+Total</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Fee</td>
+<td class='tra'  lang='pt-BR'>
+Taxa</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Refunded</td>
+<td class='tra'  lang='pt-BR'>
+Reembolso</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Customer note</td>
+<td class='tra'  lang='pt-BR'>
+Notas do comprador</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+%sPayment%s via</td>
+<td class='tra'  lang='pt-BR'>
+%sPagamento%s via</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Invoice to</td>
+<td class='tra'  lang='pt-BR'>
+Fatura para</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Ship to</td>
+<td class='tra'  lang='pt-BR'>
+Endereço de Entrega</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Invoice</td>
+<td class='tra'  lang='pt-BR'>
+Fatura</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Order Number %s</td>
+<td class='tra'  lang='pt-BR'>
+Número do pedido %s</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Order Date %s</td>
+<td class='tra'  lang='pt-BR'>
+Data do pedido %s</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Feel free to use the placeholders %s %s %s %s and %s. %s %sNote:%s %s is required.</td>
+<td class='tra'  lang='pt-BR'>
+Sinta-se livre para usar espaços reservados %s %s %s %s %s e %s. %s %sNota:%s %s é requerido.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+VAT %s</td>
+<td class='tra'  lang='pt-BR'>
+VAT %s</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Feel free to use</td>
+<td class='tra'  lang='pt-BR'>
+Sinta-se livre para usar</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Quantity</td>
+<td class='tra'  lang='pt-BR'>
+Quantidade</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Unit price</td>
+<td class='tra'  lang='pt-BR'>
+Preço unitário</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Signup at %s and enter your account beyond.</td>
+<td class='tra'  lang='pt-BR'>
+Cadastre-se em %s e entre com sua conta.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+%sFormat%s of the date. Examples: %s or %s</td>
+<td class='tra'  lang='pt-BR'>
+%sFormato%s da data. Exemplos: %s ou %s</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Show invoice</td>
+<td class='tra'  lang='pt-BR'>
+Mostrar fatura</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+%sFormat%s of the date.</td>
+<td class='tra'  lang='pt-BR'>
+%sFormato%s da data.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Use [prefix], [suffix] and [number] as placeholders.</td>
+<td class='tra'  lang='pt-BR'>
+Use [prefixo], [sufixo] e [numero] nos espaços reservados.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Choose the color witch fits your company.</td>
+<td class='tra'  lang='pt-BR'>
+Escolha uma cor que defina sua empresa.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Choose the format for the invoice number. Use [prefix], [suffix] and [number] as placeholders.</td>
+<td class='tra'  lang='pt-BR'>
+Escolha um formato de número da fatura. Use [prefix], [suffix] e [number] nos espaços reservados.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Text to greet, congratulate or thank the customer. </td>
+<td class='tra'  lang='pt-BR'>
+Texto de agradecimento, congratulações e obrigado para o comprador. </td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Some text</td>
+<td class='tra'  lang='pt-BR'>
+Algum texto</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Text to greet, congratulate or thank the customer.</td>
+<td class='tra'  lang='pt-BR'>
+Texto para agradecer, congratular e obrigado para o cliente.</td>
+</tr>
+<tr class='i'>
+<td class='src'  lang='en'>
+Start all over on the first of January.</td>
+<td class='tra'  lang='pt-BR'>
+Começar tudo de novo no dia 1 de Janeiro.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</body>
+</html>
